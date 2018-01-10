@@ -1,22 +1,18 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-import time
 from scrapy.item import Item, Field
 from selenium import webdriver
 import scrapy
 from scrapy.http import FormRequest
 import logging
-from scrapy.utils.log import configure_logging
-from time import strftime
-from datetime import timedelta
-from datetime import datetime
-import datetime
-from scrapy.selector import HtmlXPathSelector
 from seleniumcrawler.items import YaoPinItem,ShangPinItem
 import re 
 import numpy
 import math
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class YaoPinSpider(scrapy.spiders.Spider):
     name = "yaopin"
@@ -28,7 +24,9 @@ class YaoPinSpider(scrapy.spiders.Spider):
     def __init__(self, *args, **kwargs):
         options = webdriver.ChromeOptions()
         # options.binary_location = '/usr/bin/google-chrome-unstable'
+        # options.binary_location = '/usr/bin/google-chrome-stable'
         options.add_argument('headless')
+        options.add_argument('no-sandbox')
         # initialize the driver
         self.driver = webdriver.Chrome(chrome_options=options)
         # self.driver = webdriver.PhantomJS()#webdriver.Firefox()

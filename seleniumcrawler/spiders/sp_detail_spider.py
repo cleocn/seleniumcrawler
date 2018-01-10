@@ -31,6 +31,7 @@ class SPDetailSpider(scrapy.spiders.Spider):
         options = webdriver.ChromeOptions()
         # options.binary_location = '/usr/bin/google-chrome-unstable'
         options.add_argument('headless')
+        options.add_argument('no-sandbox')
         # initialize the driver
         self.driver = webdriver.Chrome(chrome_options=options)
         # self.driver = webdriver.PhantomJS()#webdriver.Firefox()
@@ -39,19 +40,19 @@ class SPDetailSpider(scrapy.spiders.Spider):
 
         # self.cursor.close()
         # self.cnx.close()
-        logging.info("ShangPinSpider Init finished")
+        logging.info(u"ShangPinSpider Init finished")
     
     def getOne(self):
         if (not self.cnx or not self.cnx.is_connected()):
             self.cnx = mysql.connector.connect(**CONFIG.MYSQL_CONN)
             self.cursor = self.cnx.cursor()
-        sql = "select * from `通用名药品` where loaded=0 limit 1"
+        sql = u"select * from `通用名药品` where loaded=0 limit 1"
         self.cursor.execute(sql)
         requests = []
         for item in self.cursor:
             # 国产药品 http://app2.sfda.gov.cn/datasearchp/all.do?page=2&name=%E5%B9%B2%E9%85%B5%E6%AF%8D%E7%89%87&tableName=TABLE25&formRender=gjcx&searchcx=&paramter0=&paramter1=&paramter2=
             # 进口药品 http://app2.sfda.gov.cn/datasearchp/all.do?page=2&name=%E4%BA%BA%E8%A1%80%E7%99%BD%E8%9B%8B%E7%99%BD&tableName=TABLE36&formRender=gjcx&searchcx=&paramter0=&paramter1=&paramter2=
-            url_template = "http://app2.sfda.gov.cn/datasearchp/all.do?page=%(page)s&name=%(drug)s&tableName=%(table)s&formRender=gjcx&"
+            url_template = u"http://app2.sfda.gov.cn/datasearchp/all.do?page=%(page)s&name=%(drug)s&tableName=%(table)s&formRender=gjcx&"
             if int(item['guochan_count'])>0: # 国产药品
                 page_count = int(math.ceil( int(item['guochan_count']) / 15.0 ))
                 for pageno in numpy.arange(1,page_count+1,1):
@@ -65,7 +66,7 @@ class SPDetailSpider(scrapy.spiders.Spider):
         return requests
 
     def parse(self, response):
-        self.log('parse_shangpin_detail processing: %s'%response.url)
+        self.log(u'parse_shangpin_detail processing: %s'%response.url)
         
         self.driver.get(response.url)
         # wait up to 10 seconds for the elements to become available
@@ -74,7 +75,7 @@ class SPDetailSpider(scrapy.spiders.Spider):
         items = []
         drug_items = self.driver.find_elements_by_xpath("//table[@class='msgtab']/tbody/tr[td]")
 
-        self.log("found %d drug items." % drug_items.__len__())
+        self.log(u"found %d drug items." % drug_items.__len__())
         #each trip div has desribed two trip legs, we have to create 2 elements for each div
         for drug in drug_items:
             #1st trip leg

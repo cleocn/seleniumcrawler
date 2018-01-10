@@ -9,7 +9,7 @@
 #     http://doc.scrapy.org/en/latest/topics/settings.html
 #
 
-BOT_NAME = 'sda'
+BOT_NAME = 'yaopin'
 
 SPIDER_MODULES = ['seleniumcrawler.spiders']
 NEWSPIDER_MODULE = 'seleniumcrawler.spiders'

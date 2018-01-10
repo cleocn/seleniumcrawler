@@ -1,0 +1,11 @@
+
+version: "3.3"
+
+# docker run -p 6800:6800 -v /var/docker_data/scrapyd:/var/lib/scrapyd njordr/scrapyd
+services:
+  scrapyd:
+      image: ccr.ccs.tencentyun.com/cleocn/scrapyd:4 #njordr/scrapyd 
+      ports:
+          - 3068:6800
+      volumes:
+        - /data/scrapyd:/var/lib/scrapyd

@@ -8,6 +8,9 @@
 import scrapy
 
 
+class BaseItem(scrapy.Item):
+    name = scrapy.Field()
+
 class YaoPinItem(scrapy.Item):
     # define the fields for your item here like:
     name = scrapy.Field()
@@ -28,3 +31,10 @@ class ShangPinItem(scrapy.Item):
     jixing = scrapy.Field()
     guige = scrapy.Field()
     page = scrapy.Field()
+
+class HospitalItem(BaseItem):
+    provinceId = scrapy.Field()
+    hGrade = scrapy.Field()
+    hName = scrapy.Field()
+    hType = scrapy.Field()
+    provinceName = scrapy.Field()

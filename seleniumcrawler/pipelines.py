@@ -7,26 +7,32 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 import mysql.connector
-from seleniumcrawler.items import YaoPinItem,ShangPinItem
+from seleniumcrawler.items import YaoPinItem,ShangPinItem,HospitalItem
 import logging 
 import seleniumcrawler.config as CONFIG
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class SeleniumcrawlerPipeline(object):
 
     def open_spider(self, spider):
         self.cnx = mysql.connector.connect(**CONFIG.MYSQL_CONN)
         self.cursor = self.cnx.cursor()
+        logging.info('open_spider+++++++++')
 
-    def close_spider(self, spider):
-        self.cursor.close()
-        self.cnx.close()
+    # def close_spider(self, spider):
+    #     self.cursor.close()
+    #     self.cnx.close()
+    #     logging.info('close_spider++++++++')
+    #     pass
     
     def process_item(self, item, spider):
         if (not self.cnx or not self.cnx.is_connected()):
             self.cnx = mysql.connector.connect(**CONFIG.MYSQL_CONN)
             self.cursor = self.cnx.cursor()
 
-        logging.info('process_item %s: (%s)'%(item['name'],type(item) ))
+        logging.info('+++process_item %s: (%s)'%(item['name'],type(item) ))
 
         #通用名 - 药品
         if isinstance(item, YaoPinItem):
@@ -48,8 +54,17 @@ class SeleniumcrawlerPipeline(object):
                         )
             self.cursor.execute(add_drug, dict(item))
             return item
-
+        #医院
+        if isinstance(item, HospitalItem):
+            logging.debug('process_item 医院')
+            add_drug = ("INSERT INTO `医院` "
+                        " (`医院名称`, `医院类别`, `医院等级`, `provinceId`, `provinceName`) "
+                        " VALUES ( %(hName)s, %(hType)s, %(hGrade)s, %(provinceId)s, %(provinceName)s ) "
+                        " ON DUPLICATE KEY UPDATE `医院类别`=%(hType)s, `医院等级`=%(hGrade)s, `provinceId`=%(provinceId)s , `provinceName`=%(provinceName)s ; "
+                        )
+            self.cursor.execute(add_drug, dict(item))
+            return item
         # self.cursor.close()
         # self.cnx.close()
-        logging.error('process_item 错误类型')
+        logging.error(u'process_item 错误类型')
         pass
